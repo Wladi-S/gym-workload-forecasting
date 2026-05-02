@@ -3,7 +3,11 @@ name = "gym-scraper"
 version = "0.1.0"
 description = "Gym workload scraper logic"
 requires-python = ">=3.13"
-dependencies = []
+dependencies = [
+    "psycopg[binary]>=3.2",
+    "pydantic-settings>=2.6",
+    "requests>=2.32",
+]
 
 [build-system]
 requires = ["hatchling>=1.27"]
