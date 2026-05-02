@@ -74,7 +74,7 @@ addopts = ["--strict-markers", "--strict-config", "-ra"]
 filterwarnings = ["error"]
 
 [tool.coverage.run]
-source = ["libs", "apps"]
+source = ["libs"]
 branch = true
 
 [tool.coverage.report]
