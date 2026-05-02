@@ -1,5 +1,5 @@
 [group('install')]
-install: install-project
+install: install-project install-hooks
 
 [group('install')]
 install-hooks:
