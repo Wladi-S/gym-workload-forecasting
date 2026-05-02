@@ -20,8 +20,7 @@ uv run just install
 3. `uv run pre-commit install --hook-type=commit-msg`
 
 Nicht in `just install` enthalten und einmalig vom Maintainer auszuführen:
-- Codecov-Token setzen (siehe [`github-setup.md`](github-setup.md))
-- Rulesets importieren (`uv run just install-rulesets`)
+- Rulesets importieren (`uv run just install-rulesets`, siehe [`github-setup.md`](github-setup.md))
 
 ## Tägliches Arbeiten
 

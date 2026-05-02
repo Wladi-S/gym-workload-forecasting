@@ -3,7 +3,6 @@
 [![check](https://github.com/Wladi-S/gym-workload-forecasting/actions/workflows/check.yml/badge.svg)](https://github.com/Wladi-S/gym-workload-forecasting/actions/workflows/check.yml)
 [![gitleaks](https://github.com/Wladi-S/gym-workload-forecasting/actions/workflows/gitleaks.yml/badge.svg)](https://github.com/Wladi-S/gym-workload-forecasting/actions/workflows/gitleaks.yml)
 [![security](https://github.com/Wladi-S/gym-workload-forecasting/actions/workflows/security.yml/badge.svg)](https://github.com/Wladi-S/gym-workload-forecasting/actions/workflows/security.yml)
-[![codecov](https://codecov.io/gh/Wladi-S/gym-workload-forecasting/branch/main/graph/badge.svg)](https://codecov.io/gh/Wladi-S/gym-workload-forecasting)
 [![license](https://img.shields.io/github/license/Wladi-S/gym-workload-forecasting)](LICENSE)
 [![python](https://img.shields.io/badge/python-3.13-blue.svg)](https://www.python.org/downloads/)
 
