@@ -1,0 +1,29 @@
+name: Check
+on:
+  pull_request:
+    branches: ['*']
+  push:
+    branches: [main]
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: uv sync --group=check
+      - run: uv run just check-format
+      - run: uv run just check-code
+      - run: uv run just check-type
+      - run: uv run just check-security
+      - run: uv run just check-coverage
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v5
+        with:
+          files: ./coverage.xml
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}

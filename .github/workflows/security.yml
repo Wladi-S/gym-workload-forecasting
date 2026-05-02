@@ -1,0 +1,15 @@
+name: Security
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  pip-audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - run: uv sync --group=check
+      - name: Run pip-audit
+        run: uv run pip-audit --strict
