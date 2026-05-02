@@ -1,2 +1,5 @@
-def test_python_works() -> None:
-    assert 1 + 1 == 2
+import gym_scraper
+
+
+def test_package_importable() -> None:
+    assert gym_scraper is not None
