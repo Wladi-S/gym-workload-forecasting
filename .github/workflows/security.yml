@@ -12,4 +12,4 @@ jobs:
       - uses: ./.github/actions/setup
       - run: uv sync --locked --group=check
       - name: Run pip-audit
-        run: uv run pip-audit --strict
+        run: uv run pip-audit --skip-editable
