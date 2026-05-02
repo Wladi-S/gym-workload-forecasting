@@ -10,6 +10,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - run: uv sync --group=check
+      - run: uv sync --locked --group=check
       - name: Run pip-audit
         run: uv run pip-audit --strict
