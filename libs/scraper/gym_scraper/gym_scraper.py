@@ -162,13 +162,9 @@ def main(
     env = _environment(environ)
     mandant = _required_env("SCRAPER_MANDANT", env)
     local_db_config = build_db_config("SCRAPER_LOCAL_DB", env)
-    supabase_db_config = build_db_config(
-        "SCRAPER_SUPABASE_DB", env, default_sslmode="require"
-    )
+    supabase_db_config = build_db_config("SCRAPER_SUPABASE_DB", env, default_sslmode="require")
 
-    readings = collect_readings(
-        mandant=mandant, gym_ids=gym_ids, fetch=fetch, clock=clock
-    )
+    readings = collect_readings(mandant=mandant, gym_ids=gym_ids, fetch=fetch, clock=clock)
     if not readings:
         raise RuntimeError("No gym readings collected")
 
