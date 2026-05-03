@@ -19,4 +19,5 @@ jobs:
       - run: uv run just check-code
       - run: uv run just check-type
       - run: uv run just check-security
+      - run: uv run just check-audit
       - run: uv run just check-coverage

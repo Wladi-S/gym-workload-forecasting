@@ -143,8 +143,8 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 | Aspekt | Inhalt |
 |---|---|
-| **Eingeführt** | uv, Ruff, mypy, pytest, pytest-cov, Conventional Commits + Commitizen, GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile, LICENSE, PR/Issue-Template |
-| **Optional / später** | Bandit, pip-audit, Codecov, VS Code Settings, `direnv`, `act` |
+| **Eingeführt** | uv, Ruff, mypy, pytest, pytest-cov, pip-audit, Conventional Commits + Commitizen, GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile, LICENSE, PR/Issue-Template |
+| **Optional / später** | Bandit, Codecov, VS Code Settings, `direnv`, `act` |
 | **Weglassen** | Docker, FastAPI, Dagster, MLflow, Streamlit, PostgreSQL-Migration, MkDocs |
 | **Begründung** | Nur technisches Fundament. Scraper bleibt produktiv unverändert; DB-Migration kommt bewusst nach der Foundation. |
 | **Lernfokus** | Modernes Python-Projektsetup, CI/CD-Grundlagen, GitHub-Workflow, Security-Grundlagen, schrittweise Migration produktiver Logik |
@@ -244,7 +244,7 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 | Milestone | Neu eingeführt |
 |---|---|
-| M0 | uv, Ruff, mypy, pytest, pytest-cov, Conventional Commits + Commitizen, GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile |
+| M0 | uv, Ruff, mypy, pytest, pytest-cov, pip-audit, Conventional Commits + Commitizen, GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile |
 | M1 | Docker, docker-compose, PostgreSQL, Alembic, idempotente Upserts, deterministische Unique Keys, Dual-Write, lokaler `pg_dump`/`pg_restore`-Smoke-Test |
 | M2 | FastAPI, Pydantic, pydantic-settings, Caddy + Auto-TLS, slowapi, Sentry, UptimeRobot, Trivy, release-please, GHCR, Tag-Releases |
 | M2.5 | Externe `pg_dump`-Backup-Senke, Restore-Runbook, Mirror-Lag-Monitoring, UFW/Firewall, Secret-Hardening, Dead-Letter für Mirror-Writes |
