@@ -5,7 +5,9 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, cast
 from zoneinfo import ZoneInfo
 
+import psycopg
 import requests
+from psycopg.conninfo import make_conninfo
 
 BERLIN = ZoneInfo("Europe/Berlin")
 REQUEST_TIMEOUT_SECONDS = 15
@@ -16,6 +18,19 @@ type DbConfig = dict[str, str | int]
 type Reading = tuple[int, Decimal, datetime]
 type Clock = Callable[[], datetime]
 type Fetcher = Callable[[int, str], Mapping[str, object]]
+type Writer = Callable[[DbConfig, list[Reading], str], None]
+
+SQL_INSERT_IF_CHANGED = """
+INSERT INTO public.data (gym_id, workload, recorded_at)
+SELECT %s, %s, %s
+WHERE %s IS DISTINCT FROM (
+  SELECT workload
+  FROM public.data
+  WHERE gym_id = %s
+  ORDER BY recorded_at DESC
+  LIMIT 1
+);
+"""
 
 
 def _environment(environ: Mapping[str, str] | None) -> Mapping[str, str]:
@@ -114,3 +129,63 @@ def collect_readings(
         readings.append((gym_id, workload_new, recorded_at))
 
     return readings
+
+
+def write_readings(
+    db_config: DbConfig,
+    readings: list[Reading],
+    db_name: str,
+) -> None:
+    conninfo = make_conninfo(**cast(Any, db_config))
+
+    with psycopg.connect(conninfo) as conn, conn.cursor() as cur:
+        # sorgt dafür, dass Anzeige/Parsing konsistent auf Berlin steht
+        cur.execute("SET TIME ZONE 'Europe/Berlin';")
+
+        for gym_id, workload_new, recorded_at in readings:
+            cur.execute(
+                SQL_INSERT_IF_CHANGED,
+                (gym_id, workload_new, recorded_at, workload_new, gym_id),
+            )
+
+    # print(f"Finished writing to {db_name}")
+
+
+def main(
+    *,
+    environ: Mapping[str, str] | None = None,
+    fetch: Fetcher = get_data,
+    writer: Writer = write_readings,
+    gym_ids: Sequence[int] = GYM_IDS,
+    clock: Clock = now_berlin,
+) -> None:
+    env = _environment(environ)
+    mandant = _required_env("SCRAPER_MANDANT", env)
+    local_db_config = build_db_config("SCRAPER_LOCAL_DB", env)
+    supabase_db_config = build_db_config(
+        "SCRAPER_SUPABASE_DB", env, default_sslmode="require"
+    )
+
+    readings = collect_readings(
+        mandant=mandant, gym_ids=gym_ids, fetch=fetch, clock=clock
+    )
+    if not readings:
+        raise RuntimeError("No gym readings collected")
+
+    write_errors: list[psycopg.Error] = []
+
+    for db_config, db_name in (
+        (local_db_config, "local database"),
+        (supabase_db_config, "Supabase"),
+    ):
+        try:
+            writer(db_config, readings, db_name)
+        except psycopg.Error as exc:
+            write_errors.append(exc)
+
+    if len(write_errors) == 2:
+        raise RuntimeError("All database writes failed") from write_errors[0]
+
+
+if __name__ == "__main__":
+    main()

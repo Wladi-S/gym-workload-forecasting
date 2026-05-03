@@ -2,6 +2,7 @@ from datetime import datetime
 from decimal import Decimal
 from zoneinfo import ZoneInfo
 
+import psycopg
 import pytest
 import requests
 from gym_scraper import gym_scraper as scraper
@@ -87,3 +88,30 @@ def test_collect_readings_skips_invalid_numval_payloads() -> None:
     )
 
     assert readings == [(11, Decimal("42.5"), recorded_at)]
+
+
+def test_main_attempts_supabase_write_when_local_write_fails() -> None:
+    recorded_at = datetime(2026, 5, 3, 12, 30, tzinfo=BERLIN)
+    attempted_targets: list[str] = []
+
+    def fetch(_gym_id: int, _mandant: str) -> dict[str, object]:
+        return {"numval": "12"}
+
+    def writer(
+        _db_config: scraper.DbConfig,
+        _readings: list[tuple[int, Decimal, datetime]],
+        db_name: str,
+    ) -> None:
+        attempted_targets.append(db_name)
+        if db_name == "local database":
+            raise psycopg.OperationalError("local down")
+
+    scraper.main(
+        environ=complete_env(),
+        fetch=fetch,
+        writer=writer,
+        gym_ids=[1],
+        clock=lambda: recorded_at,
+    )
+
+    assert attempted_targets == ["local database", "Supabase"]
