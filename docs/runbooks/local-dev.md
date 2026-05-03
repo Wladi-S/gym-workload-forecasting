@@ -26,7 +26,7 @@ Nicht in `just install` enthalten und einmalig vom Maintainer auszuführen:
 
 ```bash
 uv run just format    # Auto-Fix Imports + Formatting
-uv run just check     # Voll-Check: format, code, type, security, coverage
+uv run just check     # Voll-Check: format, code, type, security, dependency audit, coverage
 ```
 
 Alle Targets via `uv run just --list`.

@@ -1,6 +1,11 @@
 # run check tasks (Format zuerst — schnellster Fail-Pfad)
 [group('check')]
-check: check-format check-code check-type check-security check-coverage
+check: check-format check-code check-type check-security check-audit check-coverage
+
+# check dependency vulnerabilities
+[group('check')]
+check-audit:
+    uv run pip-audit --skip-editable
 
 # check code quality (Lint)
 [group('check')]
