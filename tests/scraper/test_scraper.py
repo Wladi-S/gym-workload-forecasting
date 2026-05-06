@@ -18,12 +18,6 @@ def complete_env() -> dict[str, str]:
         "SCRAPER_LOCAL_DB__NAME": "local-db",
         "SCRAPER_LOCAL_DB__USER": "local-user",
         "SCRAPER_LOCAL_DB__PASSWORD": "local-secret",
-        "SCRAPER_SUPABASE_DB__HOST": "supabase-host",
-        "SCRAPER_SUPABASE_DB__PORT": "6543",
-        "SCRAPER_SUPABASE_DB__NAME": "supabase-db",
-        "SCRAPER_SUPABASE_DB__USER": "supabase-user",
-        "SCRAPER_SUPABASE_DB__PASSWORD": "supabase-secret",
-        "SCRAPER_SUPABASE_DB__SSLMODE": "require",
     }
 
 
@@ -90,7 +84,7 @@ def test_collect_readings_skips_invalid_numval_payloads() -> None:
     assert readings == [(11, Decimal("42.5"), recorded_at)]
 
 
-def test_main_attempts_supabase_write_when_local_write_fails() -> None:
+def test_main_writes_to_local_database_only() -> None:
     recorded_at = datetime(2026, 5, 3, 12, 30, tzinfo=BERLIN)
     attempted_targets: list[str] = []
 
@@ -98,13 +92,12 @@ def test_main_attempts_supabase_write_when_local_write_fails() -> None:
         return {"numval": "12"}
 
     def writer(
-        _db_config: scraper.DbConfig,
+        db_config: scraper.DbConfig,
         _readings: list[tuple[int, Decimal, datetime]],
         db_name: str,
     ) -> None:
         attempted_targets.append(db_name)
-        if db_name == "local database":
-            raise psycopg.OperationalError("local down")
+        assert db_config["host"] == "local-host"
 
     scraper.main(
         environ=complete_env(),
@@ -114,4 +107,27 @@ def test_main_attempts_supabase_write_when_local_write_fails() -> None:
         clock=lambda: recorded_at,
     )
 
-    assert attempted_targets == ["local database", "Supabase"]
+    assert attempted_targets == ["local database"]
+
+
+def test_main_raises_when_local_database_write_fails() -> None:
+    recorded_at = datetime(2026, 5, 3, 12, 30, tzinfo=BERLIN)
+
+    def fetch(_gym_id: int, _mandant: str) -> dict[str, object]:
+        return {"numval": "12"}
+
+    def writer(
+        _db_config: scraper.DbConfig,
+        _readings: list[tuple[int, Decimal, datetime]],
+        _db_name: str,
+    ) -> None:
+        raise psycopg.OperationalError("local down")
+
+    with pytest.raises(RuntimeError, match="Local database write failed"):
+        scraper.main(
+            environ=complete_env(),
+            fetch=fetch,
+            writer=writer,
+            gym_ids=[1],
+            clock=lambda: recorded_at,
+        )
