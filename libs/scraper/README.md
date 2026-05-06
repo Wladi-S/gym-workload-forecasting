@@ -10,18 +10,14 @@ Naming-Konvention: siehe [`docs/decisions/`](../../docs/decisions/).
 ## Laufzeitverhalten
 
 Der Scraper ruft die Workload-Werte der konfigurierten Studios beim Aidoo-Portal ab und
-schreibt erfolgreiche Messungen in zwei Datenbanken:
-
-- lokale PostgreSQL-Datenbank
-- Supabase als zusätzliche Absicherung
+schreibt erfolgreiche Messungen in die lokale PostgreSQL-Datenbank.
 
 Ein fehlgeschlagener Studio-Request, eine fehlerhafte Antwort oder ein ungültiger
 `numval`-Wert stoppt den Lauf nicht. Das betroffene Studio wird übersprungen, alle
 anderen Studios werden weiter verarbeitet.
 
-Die Datenbank-Writes werden ebenfalls getrennt versucht. Wenn ein Write-Ziel fehlschlägt,
-wird das andere trotzdem ausgeführt. Der Scraper wirft eine Exception, wenn keine
-Messungen gesammelt wurden oder wenn beide Datenbank-Writes fehlschlagen.
+Der M1-Betriebsmodus ist Postgres-only. Supabase-Mirroring wird in einem späteren
+Milestone wieder bewusst eingeführt.
 
 ## Konfiguration
 
@@ -33,7 +29,6 @@ Wichtige Gruppen:
 
 - `SCRAPER_MANDANT`
 - `SCRAPER_LOCAL_DB__*`
-- `SCRAPER_SUPABASE_DB__*`
 
 ## Lokale Checks
 

@@ -162,25 +162,15 @@ def main(
     env = _environment(environ)
     mandant = _required_env("SCRAPER_MANDANT", env)
     local_db_config = build_db_config("SCRAPER_LOCAL_DB", env)
-    supabase_db_config = build_db_config("SCRAPER_SUPABASE_DB", env, default_sslmode="require")
 
     readings = collect_readings(mandant=mandant, gym_ids=gym_ids, fetch=fetch, clock=clock)
     if not readings:
         raise RuntimeError("No gym readings collected")
 
-    write_errors: list[psycopg.Error] = []
-
-    for db_config, db_name in (
-        (local_db_config, "local database"),
-        (supabase_db_config, "Supabase"),
-    ):
-        try:
-            writer(db_config, readings, db_name)
-        except psycopg.Error as exc:
-            write_errors.append(exc)
-
-    if len(write_errors) == 2:
-        raise RuntimeError("All database writes failed") from write_errors[0]
+    try:
+        writer(local_db_config, readings, "local database")
+    except psycopg.Error as exc:
+        raise RuntimeError("Local database write failed") from exc
 
 
 if __name__ == "__main__":

@@ -2,16 +2,16 @@
 
 | | |
 |---|---|
-| **Datum** | 2026-05-02 |
+| **Datum** | 2026-05-05 |
 | **Status** | Draft |
 | **Domain** | wladis.de |
 | **Repo** | github.com/Wladi-S/gym-workload-forecasting |
-| **Bundesland** | Rheinland-Pfalz (alle 13 Studios) |
+| **Bundesland** | Rheinland-Pfalz (alle 14 Studios) |
 | **TOS** | Erlaubnis erteilt Daten zu sammeln und zu veröffentlichen |
 
 ## 1. Overview
 
-End-to-End-MLOps-Plattform für die 13 Fitnessstudios in Rheinland-Pfalz. Die Plattform baut auf einem seit Januar 2023 laufenden Scraper (~3 Mio. Datenpunkte) auf und ergänzt ihn um Datenvalidierung, Anreicherung, Modell-Training und öffentliche Bereitstellung via API und Dashboard.
+End-to-End-MLOps-Plattform für die 14 Fitnessstudios in Rheinland-Pfalz. Die Plattform baut auf einem seit Januar 2023 laufenden Scraper (~3 Mio. Datenpunkte) auf und ergänzt ihn um Datenvalidierung, Anreicherung, Modell-Training und öffentliche Bereitstellung via API und Dashboard.
 
 **Doppelter Zweck:**
 1. **Portfolio + Lerneffekt** (primär): Das Repo ist das eigentliche Produkt. Lernen moderner MLOps-Tools (Docker, PostgreSQL, Dagster, MLflow, Polars, GitHub Actions) hat Top-Priorität. Markdown-Doku dient als Arbeitskontext, ADR-Sammlung und Claude-Code-Kontext — keine eigene Doku-Site.
@@ -35,7 +35,7 @@ End-to-End-MLOps-Plattform für die 13 Fitnessstudios in Rheinland-Pfalz. Die Pl
 | **G3** | Modell-Qualität erreicht in M4 empirisch festgelegte absolute Schwelle | MAE < Schwellwert auf Rolling-30-Tage-Holdout |
 | **G4** | Vollautomatisierte Kette (Scrape → Postgres → Features → Modell → Predictions → API) | Kein manueller Eingriff über ≥ 30 zusammenhängende Tage |
 | **G5** | Repo entspricht „Senior-MLOps"-Niveau | Grüne CI, README mit Architektur-Skizze + Live-Links |
-| **G6** | Reproduzierbares Setup auf neuem System | Fresh-Clone-Runbook funktioniert; `just setup`/`up`/`test`/`health` arbeiten; `.env.example` vollständig; Migrations reproduzierbar |
+| **G6** | Reproduzierbares Setup auf neuem System | Fresh-Clone-Runbook funktioniert; milestone-passende `just`-Targets arbeiten (`install`/`check` in M0, später `up`/`health`/DB-Targets); `.env.example` vollständig; DB-Initialisierung reproduzierbar |
 | **G7** | PostgreSQL ist die kanonische operative Datenbank | API/Dagster/Training lesen aus Postgres; Supabase-Ausfall ist nicht kritisch; Backup/Restore-Runbook getestet |
 
 ## 4. Non-Goals
@@ -47,7 +47,7 @@ End-to-End-MLOps-Plattform für die 13 Fitnessstudios in Rheinland-Pfalz. Die Pl
 - Keine Multi-Region- / HA-Setup, kein Staging — manueller Rollback akzeptabel
 - Keine atomaren Multi-DB-Transaktionen — Postgres gewinnt, Supabase-Mirroring best-effort und retrybar
 - Supabase nicht als langfristige Source of Truth für API/Pipeline/Training
-- Keine Reimplementierung des Scrapers in M0 — bleibt Black-Box bis zur Dagster-Integration in M3
+- Keine vollständige Scraper-Neuarchitektur in M0 — nur das minimale Hardening, das für ein öffentliches Repo und sichtbare Ausfälle nötig ist; Dagster-Integration bleibt M3
 
 **ML & Pipeline**
 - Kein Online-Learning (tägliches Retraining genügt)
@@ -64,7 +64,7 @@ End-to-End-MLOps-Plattform für die 13 Fitnessstudios in Rheinland-Pfalz. Die Pl
 
 | Gruppe | Beschreibung | Größe | Touchpoints |
 |---|---|---|---|
-| **Studio-Member** | Endnutzer der 13 RLP-Studios, planen Training nach erwarteter Auslastung | ~100–200 | Public API |
+| **Studio-Member** | Endnutzer der 14 RLP-Studios, planen Training nach erwarteter Auslastung | ~100–200 | Public API |
 | **Hiring Manager / Reviewer** | Bewerten Engineering-Praxis und Portfolio-Qualität | offen | Repo, README, Live-Dashboard, Live-API |
 | **Author** | Solo-Entwickler; Self-Monitoring der Modell-Qualität, Tool-Lerneffekt | 1 | Dashboard, MLflow-UI, Dagster-UI (intern) |
 
@@ -73,7 +73,7 @@ End-to-End-MLOps-Plattform für die 13 Fitnessstudios in Rheinland-Pfalz. Die Pl
 ## 6. Core Features
 
 ### 6.1 Public Workload API
-REST-Service unter eigener Subdomain mit Auto-TLS. Liefert für alle 13 Studios aktuelle, historische und prognostizierte Werte. **Liest ausschließlich aus der lokalen PostgreSQL** — Supabase liegt nicht im kritischen Request-Pfad. Externes Monitoring (UptimeRobot), Error-Tracking (Sentry), Rate-Limiting pro IP, gesetzliche Pflicht-Seiten (Impressum, Datenschutz nach DSGVO).
+REST-Service unter eigener Subdomain mit Auto-TLS. Liefert für alle 14 Studios aktuelle, historische und prognostizierte Werte. **Liest ausschließlich aus der lokalen PostgreSQL** — Supabase liegt nicht im kritischen Request-Pfad. Externes Monitoring (UptimeRobot), Error-Tracking (Sentry), Rate-Limiting pro IP, gesetzliche Pflicht-Seiten (Impressum, Datenschutz nach DSGVO).
 
 ### 6.2 Automatisierte Daten-Pipeline (Dagster)
 Tägliche orchestrierte Pipeline: Resampling der Roh-Scrapes aus PostgreSQL auf einheitliches Zeitraster, Anreicherung mit **Wetter** (Open-Meteo), **Feiertagen** (`holidays`-PyPI), **Schulferien** (mecodia-API), Datenqualität via **Pandera** mit zweistufigen Schwellen (weiche Warning, harte Stop-Schwelle für Modell-Training). Backfill-fähig über die volle Historie ab 2023. Supabase ist optional als Migrations-/Mirror-Quelle, **keine Voraussetzung** für tägliche Pipeline-Läufe.
@@ -82,7 +82,7 @@ Tägliche orchestrierte Pipeline: Resampling der Roh-Scrapes aus PostgreSQL auf 
 Tägliches **XGBoost**-Retraining außerhalb der Studio-Öffnungszeiten. Tracking via **MLflow**. Eine **Naive Baseline** (Wochentag-Stunde-Median) dient zugleich als Vergleichs-Champion und als Fallback bei Modell-Versagen — Wechsel Modell ↔ Naive **ohne Code-Change** steuerbar. Pre-Computed Predictions werden für ein definiertes Zukunftsfenster nach jedem erfolgreichen Training in PostgreSQL geschrieben.
 
 ### 6.4 Public Dashboard (Streamlit)
-Öffentlich erreichbar, ohne Auth. Zwei Bereiche: (1) Live-Übersicht mit Heatmap aller 13 Studios und Modell-Performance über Zeit; (2) interaktive Vorhersage-Seite mit Datums-Range-Auswahl und On-Demand-Inferenz gegen das aktive Production-Modell. Read-only — keine Schreibwege.
+Öffentlich erreichbar, ohne Auth. Zwei Bereiche: (1) Live-Übersicht mit Heatmap aller 14 Studios und Modell-Performance über Zeit; (2) interaktive Vorhersage-Seite mit Datums-Range-Auswahl und On-Demand-Inferenz gegen das aktive Production-Modell. Read-only — keine Schreibwege.
 
 ### 6.5 Repo-Doku & Claude-Code-Kontext
 Keine separat veröffentlichte Doku-Site. Doku bleibt als Markdown im Repo, pragmatisch auf Arbeitsfähigkeit, Reviewer-Kontext und Claude-Code-Nutzung ausgerichtet. Im Repo gepflegt:
@@ -92,7 +92,7 @@ Keine separat veröffentlichte Doku-Site. Doku bleibt als Markdown im Repo, prag
 - Arbeitsnotizen, die Claude Code ausreichend Kontext für Implementierungen geben
 
 ### 6.6 CI/CD & Engineering-Praxis
-Auf jedem PR/Push laufen Linting (Ruff), Type-Check (mypy), Tests (pytest + Coverage), Security-Scan (Trivy). **Lokale Pre-Commit-Hooks sind ausdrücklich unerwünscht** — sie bremsen häufiges Committen; lokale Checks bleiben freiwillig, die verbindliche Qualitätskontrolle liegt in GitHub Actions. **Conventional Commits** via Commitizen. Tag-basierte Releases via release-please (kein Staging). Branch Protection auf `main` (lineare Historie, grüne CI Voraussetzung), Container-Hardening (Non-root, Read-only-FS, Multi-Stage), GHCR als Registry, Dependabot.
+Auf jedem PR/Push laufen Linting (Ruff), Format-Check, Type-Check (mypy), Tests mit Coverage, Ruff-Security-Regeln, `pip-audit` und gitleaks. Container-Scans mit Trivy starten erst ab M2, wenn Container-Artefakte existieren. **Keine Commit-Stage-Hooks, die häufiges Committen bremsen**; lokale `pre-push`- und `commit-msg`-Hooks sind erlaubt, die verbindliche Qualitätskontrolle liegt in GitHub Actions. **Conventional Commits** via Commitizen. Tag-basierte Releases via release-please (kein Staging). Branch Protection auf `main` erzwingt PRs, grüne Checks und blockiert Force-Push/Deletion; Merge-, Squash- und Rebase-Merge bleiben zulässig. Container-Hardening (Non-root, Read-only-FS, Multi-Stage), GHCR als Registry, Dependabot.
 
 ### 6.7 Observability & Alerting
 Bewusste Trennung der Alerting-Kanäle nach Domäne:
@@ -102,11 +102,11 @@ Bewusste Trennung der Alerting-Kanäle nach Domäne:
 - **DB-Health, Backup-Erfolg, Mirror-Lag** → eigene Checks
 
 ### 6.8 Reproducible Environment & Deployment
-Repo enthält alle nicht-geheimen Bausteine: Lockfile, Dockerfiles, docker-compose, PostgreSQL-Service, `.env.example`, Migrations, Healthchecks, Bootstrap-/Deploy-Scripts, Runbooks. Standardisierte Kommandos via `just`/Makefile: `setup`, `test`, `up`, `down`, `logs`, `health`, `db-migrate`, `db-backup`, `db-restore-check`, `deploy`. **Reproduzierbar = Umgebung + Services + Schema + Abläufe**, nicht produktive Daten/Secrets — die kommen über Backup/Restore.
+Zielbild: Das Repo enthält alle nicht-geheimen Bausteine: Lockfile, Dockerfiles, docker-compose, PostgreSQL-Service, `.env.example`, idempotente DB-Initialisierungs-SQL, Healthchecks, Bootstrap-/Deploy-Scripts, Runbooks. M0 beginnt mit `install`/`check`; weitere standardisierte Kommandos via `just`/Makefile wachsen milestoneweise dazu (`up`, `down`, `logs`, `health`, `db-init`, `db-backup`, `db-restore-check`, `deploy`). **Reproduzierbar = Umgebung + Services + Schema + Abläufe**, nicht produktive Daten/Secrets — die kommen über Backup/Restore.
 
 ### 6.9 Database Ownership, Mirroring & Backups
 PostgreSQL auf dem VPS enthält:
-- Rohdaten aus dem Scraper (`raw_scrapes`)
+- Rohdaten aus dem Scraper (`data`)
 - bereinigte und resampelte Beobachtungen
 - angereicherte Feature-Tabellen
 - Modell- und Batch-Metadaten
@@ -135,36 +135,37 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 ## 8. Roadmap
 
-**Konvention:** Pro Milestone nur das, was er braucht (YAGNI auf Tooling). Keine Zeitachse — fertig ist, wenn fertig ist. Kein separater Doku-Foundation-Milestone; Markdown wird opportunistisch gepflegt. **Reihenfolge:** Repo (M0) → DB-Fundament (M1) → Public API (M2) → Cutover & Hardening (M2.5) → Pipeline (M3) → ML (M4) → Predictions in API (M5) → Dashboard (M6).
+**Konvention:** Pro Milestone nur das, was er braucht (YAGNI auf Tooling). Keine Zeitachse — fertig ist, wenn fertig ist. Kein separater Doku-Foundation-Milestone; Markdown wird opportunistisch gepflegt. **Reihenfolge:** Repo (M0) → VPS-/DB-Fundament (M1) → Public API (M2) → Cutover & Hardening (M2.5) → Pipeline (M3) → ML (M4) → Predictions in API (M5) → Dashboard (M6).
 
 ### M0 — Repo-Foundation & laufender Scraper
 
-**Outcome:** Public Repo live. Bestehender Scraper läuft unverändert im Minutentakt auf dem VPS und schreibt nach Supabase. Reproduzierbares Python-Setup, grüne CI mit Linting/Type-Checking/Tests, GitHub-Hygiene, leichte Markdown-Doku. Erste Test-Coverage gegen extrahierbare Scraper-Logik.
+**Outcome:** Public Repo live. Bestehender Scraper läuft weiter im Minutentakt auf dem VPS, ist aber minimal gehärtet: Konfiguration via `SCRAPER_*`-Environment-Variablen, best-effort Fetch pro Studio, unabhängige Writes in lokale Datenbank und Supabase, sichtbarer Fehler nur bei kompletter Schreib- oder Sammelstörung. Reproduzierbares Python-Setup, grüne CI mit Linting/Formatting/Type-Checking/Tests/Coverage/Security, GitHub-Hygiene, leichte Markdown-Doku und erste Test-Coverage gegen extrahierte Scraper-Logik.
 
 | Aspekt | Inhalt |
 |---|---|
-| **Eingeführt** | uv, Ruff, mypy, pytest, pytest-cov, pip-audit, Conventional Commits + Commitizen, GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile, LICENSE, PR/Issue-Template |
-| **Optional / später** | Bandit, Codecov, VS Code Settings, `direnv`, `act` |
-| **Weglassen** | Docker, FastAPI, Dagster, MLflow, Streamlit, PostgreSQL-Migration, MkDocs |
-| **Begründung** | Nur technisches Fundament. Scraper bleibt produktiv unverändert; DB-Migration kommt bewusst nach der Foundation. |
-| **Lernfokus** | Modernes Python-Projektsetup, CI/CD-Grundlagen, GitHub-Workflow, Security-Grundlagen, schrittweise Migration produktiver Logik |
+| **Eingeführt** | uv-Workspace, Ruff, mypy, pytest, pytest-cov, pytest-xdist, pip-audit, Ruff-Security-Regeln, Conventional Commits + Commitizen, pre-commit nur für `pre-push`/`commit-msg`, GitHub Actions, Dependabot, Branch-Protection-Ruleset, gitleaks, `just`/Makefile, LICENSE, PR-Template, `.env.example`, Scraper-Library unter `libs/scraper` |
+| **Übernehmen** | Env-basierte Scraper-Konfiguration, robuste Workload-Parsing-Logik, best-effort Fetch pro Studio, unabhängige lokale-DB-/Supabase-Writes, sichtbarer Fehler bei leerem Scrape oder Totalausfall beider Senken, Mock-basierte Scraper-Tests |
+| **Optional / später** | Bandit, Codecov, VS Code Settings, `direnv`, `act`, Issue-Templates |
+| **Weglassen** | Docker, FastAPI, Dagster, MLflow, Streamlit, PostgreSQL-Fundament, Supabase-Backfill, MkDocs |
+| **Begründung** | M0 bleibt technisches Fundament. Das Scraper-Hardening wurde vorgezogen, weil Hardcoded-Konfiguration und unsichtbare Teilausfälle ein öffentliches Repo und stabilen Produktionsbetrieb gefährden würden. Die eigentliche DB-Migration, Schema-Versionierung und Cutover-Story bleiben bewusst nach M0. |
+| **Lernfokus** | Modernes Python-Projektsetup, CI/CD-Grundlagen, GitHub-Workflow, Security-Grundlagen, testbare Extraktion produktiver Logik, schrittweise Migration ohne Big-Bang-Risiko |
 
-### M1 — Local Postgres Foundation
+### M1 — Neuer VPS & Local Postgres Foundation
 
-**Outcome:** Eigene PostgreSQL auf VPS enthält die volle Historie aus Supabase. Schema via Alembic versioniert, idempotente Upserts mit deterministischen Unique Keys. Scraper schreibt **dual** (Supabase = kanonisch, Postgres = parallel best-effort, Postgres-Fehler stoppen den Scraper nicht). Noch nichts public.
+**Outcome:** Neuer VPS ist als künftige Produktionsbasis gehärtet, enthält das geklonte Repo, eine lokale PostgreSQL per Docker Compose und ein reproduzierbares Rohdaten-Schema über idempotente SQL-Initialisierung. Der alte VPS bleibt produktiv und schreibt weiter nach Supabase. Der neue VPS sammelt unabhängig mit eigenem Scraper und schreibt nur in seine lokale Postgres-Datenbank. Inbound ist nur SSH erlaubt; Postgres ist nicht öffentlich erreichbar. Noch nichts public, kein Cutover.
 
 | Aspekt | Inhalt |
 |---|---|
-| **Eingeführt** | Docker, docker-compose, PostgreSQL-Container (Volume + Healthcheck), Alembic, Unique Key (`source`, `studio_id`, `observed_at`), idempotente Upserts, Dual-Write-Pattern, lokale `pg_dump`/`pg_restore`-Smoke-Tests |
-| **Übernehmen** | `raw_scrapes`-Tabelle, Backfill-Skript Supabase → Postgres ab 2023, Dual-Write-Patch, manuelles Diff-Skript Row-Count/Timestamp |
-| **Optional / später** | Automatischer Diff-Report, Backfill-Resume-Logik, Materialized Views für häufige Aggregationen |
-| **Weglassen** | FastAPI, Caddy, TLS, Public-Deployment, externe Backups (M2.5), Cutover (M2.5) |
-| **Begründung** | Schema-Design ist Einbahnstraße — falsche Unique Keys/Indizes/Typen schleppen sich durch alle weiteren Milestones. Vor API-Launch isolieren. Dual-Write hält Scraper unangetastet; Cutover erfolgt erst in M2.5, nachdem Postgres mehrere Tage als parallele Senke gelaufen ist. Vermeidet API auf stale Backfill-Snapshot in M2. |
-| **Lernfokus** | PostgreSQL-Betrieb, Schema-Design, Alembic-Migrations, idempotente Schreibwege, Backfill-Strategien, Dual-Write-Pattern, Risiko-Isolation in produktiven Pipelines |
+| **Eingeführt** | VPS-Hardening-Runbook, SSH-only Betrieb, nicht-root Deploy-/Admin-User, UFW/Firewall, Docker, docker-compose, PostgreSQL-Container (Volume + Healthcheck), idempotente SQL-Initialisierung für `gym`/`data`, idempotenter Seed der 14 Studios, idempotente Rohdaten-Writes, DB- und Deploy-nahe `just`-Tasks, systemd service/timer für den Scraper |
+| **Übernehmen** | `docs/runbooks/vps-bootstrap.md`, `docs/runbooks/production-db.md`, `infra/compose/postgres.yml`, `infra/db/init/001_create_gym_data.sql`, `tasks/db.just`, `tasks/deploy.just`, Scraper-Konfiguration für lokalen Postgres-only-Betrieb, manueller Basischeck (`docker compose ps`, `select now()`, sichtbarer Scraper-Write) |
+| **Optional / später** | Initialer oder finaler Supabase-Backfill, automatischer Diff-Report, Backfill-Resume-Logik, Materialized Views für häufige Aggregationen, GitHub-Actions-Deployment per SSH |
+| **Weglassen** | FastAPI, Caddy, TLS, Public-Deployment, öffentlich erreichbarer Postgres-Port, alter VPS → neuer VPS DB-Zugriff, WireGuard, automatisierter Row-Count-Diff, Restore-Test, externe Backups (M2.5), Cutover (M2.5) |
+| **Begründung** | M1 beweist die neue Produktionsbasis ohne Risiko für den laufenden Scraper. Der alte VPS bleibt kanonisch über Supabase; der neue VPS validiert Server-Hardening, reproduzierbares Repo-Setup, lokale Postgres, einfaches SQL-Schema und Scraper-Betrieb isoliert. Kein offener DB-Port reduziert Angriffsfläche. Zusätzliches Migrationstooling wird bewusst weggelassen. Der spätere Cutover erfolgt kontrolliert in M2.5 mit finalem Backfill und Umschaltung. |
+| **Lernfokus** | VPS-Betrieb, Server-Hardening, PostgreSQL-Betrieb mit Docker Compose, Schema-Design mit SQL, idempotente Schreibwege, systemd-Betrieb, wiederholbare `just`-/Deploy-Abläufe, Risiko-Isolation in produktiven Pipelines |
 
 ### M2 — Public API v1: Historie & aktuelle Werte
 
-**Outcome:** API live unter eigener Subdomain. Liefert aktuelle und historische Auslastung der 13 Studios aus lokaler PostgreSQL (in M1 befüllt + per Dual-Write aktuell). Auto-TLS, Pflicht-Seiten, Rate-Limiting pro IP, externes Monitoring, tag-basierte Releases.
+**Outcome:** API live unter eigener Subdomain. Liefert aktuelle und in Postgres vorhandene historische Auslastung der 14 Studios aus lokaler PostgreSQL (in M1 durch den neuen VPS live befüllt, bei Bedarf vor Public Launch durch Supabase-Backfill ergänzt). Auto-TLS, Pflicht-Seiten, Rate-Limiting pro IP, externes Monitoring, tag-basierte Releases.
 
 | Aspekt | Inhalt |
 |---|---|
@@ -177,7 +178,7 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 ### M2.5 — Cutover, Backups & Deployment Hardening
 
-**Outcome:** Scraper schreibt **kanonisch** in Postgres; Supabase wird auf best-effort Raw-Mirror umgewidmet. Supabase-Ausfälle stoppen den Scraper nicht. Versionierte externe Backups, Restore-Tests, Secret-Handling, Firewall, VPS-Betrieb dokumentiert und mind. einmal validiert. **Mit dem Cutover ist G7 vollständig erfüllt.**
+**Outcome:** Scraper schreibt **kanonisch** in Postgres; Supabase wird auf best-effort Raw-Mirror umgewidmet. Supabase-Ausfälle bleiben nicht-blockierend und werden als Mirror-Fehler retrybar/überwachbar. Versionierte externe Backups, Restore-Tests, Secret-Handling, Firewall, VPS-Betrieb dokumentiert und mind. einmal validiert. **Mit dem Cutover ist G7 vollständig erfüllt.**
 
 | Aspekt | Inhalt |
 |---|---|
@@ -185,7 +186,7 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 | **Übernehmen** | Cutover-Plan (Postgres = Primär-Schreibziel, Supabase = best-effort Mirror), versionierte `pg_dump`-Backups mit Rotation, dokumentierter Restore-Test, Healthcheck-Scripts, Mirror-Lag-Report (Row-Count + Timestamp Supabase ↔ Postgres) |
 | **Optional / später** | Automatischer Restore-Test im separaten Container, täglicher Mirror-Diff-Report, vollständiges VPS-Runbook, systemd-Härtung |
 | **Weglassen** | Kubernetes, Prometheus/Grafana, Ansible, echte verteilte Transaktionen Postgres ↔ Supabase |
-| **Begründung** | DB-Story abschließen, bevor Pipeline-Schicht (M3) drauf aufsetzt. Cutover ist kontrolliert, weil Postgres seit M1 als parallele Senke und seit M2 unter API-Last lebt — kein Sprung ins Kalte. Backups ≠ Mirror — eigener Betriebsprozess mit Restore-Validierung. |
+| **Begründung** | DB-Story abschließen, bevor Pipeline-Schicht (M3) drauf aufsetzt. Cutover ist kontrolliert, weil Postgres seit M0 als primitive parallele Senke, seit M1 als SQL-initialisiertes DB-Fundament und seit M2 unter API-Last lebt — kein Sprung ins Kalte. Backups ≠ Mirror — eigener Betriebsprozess mit Restore-Validierung. |
 | **Lernfokus** | DB-Cutover-Strategien, externe Backups, Restore-Validierung, Dead-Letter-Queues für Mirror-Writes, Server-Härtung, Secrets, Mirror-Lag-Beobachtung |
 
 ### M3 — Daten-Pipeline mit Dagster
@@ -196,7 +197,7 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 |---|---|
 | **Eingeführt** | Polars, Dagster (Assets, Schedules, Backfills), Pandera, Open-Meteo Free, `holidays`-PyPI, mecodia Ferien-API, Discord-Webhook für Pipeline-Alerts |
 | **Übernehmen** | Parquet-Snapshots, DuckDB (lokales Debugging + reproduzierbare Feature-Snapshots), `httpx`, `tenacity`, `respx`, Postgres-I/O-Assets |
-| **Optional / später** | hypothesis, pytest-xdist, ydata-profiling, Typer |
+| **Optional / später** | hypothesis, ydata-profiling, Typer |
 | **Weglassen** | MLflow Registry, SHAP, Evidently, DVC, Supabase als Pipeline-Read-Dependency |
 | **Begründung** | Zentraler Data-Engineering-Milestone. Postgres ist kanonische Quelle (seit M2.5 auch im Schreibpfad); Supabase darf keine Voraussetzung für Backfills oder Pipeline-Läufe sein. Pandera validiert Datenqualität, Parquet/DuckDB helfen lokalem Debugging. |
 | **Lernfokus** | Data Engineering, Orchestrierung, Backfills, Datenqualität, API-Retries, lokale Analyse |
@@ -229,7 +230,7 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 ### M6 — Public Dashboard
 
-**Outcome:** Streamlit-Dashboard unter eigener Subdomain ohne Auth. Live-Übersicht (Heatmap aller 13 Studios + Modell-Performance über Zeit) und interaktive Vorhersage-Seite mit On-Demand-Inferenz gegen das aktive Production-Modell.
+**Outcome:** Streamlit-Dashboard unter eigener Subdomain ohne Auth. Live-Übersicht (Heatmap aller 14 Studios + Modell-Performance über Zeit) und interaktive Vorhersage-Seite mit On-Demand-Inferenz gegen das aktive Production-Modell.
 
 | Aspekt | Inhalt |
 |---|---|
@@ -244,8 +245,8 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 | Milestone | Neu eingeführt |
 |---|---|
-| M0 | uv, Ruff, mypy, pytest, pytest-cov, pip-audit, Conventional Commits + Commitizen, GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile |
-| M1 | Docker, docker-compose, PostgreSQL, Alembic, idempotente Upserts, deterministische Unique Keys, Dual-Write, lokaler `pg_dump`/`pg_restore`-Smoke-Test |
+| M0 | uv-Workspace, Ruff, mypy, pytest, pytest-cov, pytest-xdist, pip-audit, Ruff-Security-Regeln, Conventional Commits + Commitizen, pre-commit (`pre-push`/`commit-msg`), GitHub Actions, Dependabot, Branch Protection, gitleaks, `just`/Makefile, erste Scraper-Hardening-Schicht |
+| M1 | VPS-Hardening, SSH-only Betrieb, UFW/Firewall, Docker, docker-compose, PostgreSQL, idempotente SQL-Initialisierung, `gym`/`data`-Schema, idempotente Rohdaten-Writes, systemd service/timer, DB-/Deploy-`just`-Tasks |
 | M2 | FastAPI, Pydantic, pydantic-settings, Caddy + Auto-TLS, slowapi, Sentry, UptimeRobot, Trivy, release-please, GHCR, Tag-Releases |
 | M2.5 | Externe `pg_dump`-Backup-Senke, Restore-Runbook, Mirror-Lag-Monitoring, UFW/Firewall, Secret-Hardening, Dead-Letter für Mirror-Writes |
 | M3 | Polars, Dagster, Pandera, Open-Meteo, `holidays`, mecodia, Discord-Webhook |
@@ -257,12 +258,13 @@ Grüner CI-Badge + Coverage-Badge. README mit Architektur-Skizze, Live-Demo-Link
 
 ```
 gym-workload-forecasting/
-├── .github/                     ← Workflows, Templates, Dependabot
+├── .github/                     ← Workflows, Rulesets, Templates, Dependabot
+│   ├── actions/
 │   ├── workflows/
-│   ├── ISSUE_TEMPLATE/
+│   ├── rulesets/
 │   ├── PULL_REQUEST_TEMPLATE.md
 │   └── dependabot.yml
-├── apps/                        ← Deploybare Services (jeder mit Dockerfile)
+├── apps/                        ← Deploybare Services (Dockerfiles ab jeweiligem Service-Milestone)
 │   ├── api/
 │   ├── dashboard/
 │   └── pipeline/
@@ -275,14 +277,12 @@ gym-workload-forecasting/
 │   └── training/
 ├── docs/                        ← Interne Markdown-Doku / Claude-Code-Kontext
 │   ├── prd.md
-│   ├── adr/
-│   ├── architecture/
+│   ├── architecture.md
 │   ├── runbooks/
-│   └── notes/
+│   └── decisions/               ← optional, falls ADRs versioniert werden
 ├── infra/                       ← Operational-Layer (kein App-Code)
 │   ├── compose/
 │   ├── caddy/
-│   ├── migrations/
 │   ├── db/
 │   │   ├── init/
 │   │   └── backup/
@@ -292,6 +292,8 @@ gym-workload-forecasting/
 │   └── scraper/
 ├── .env.example
 ├── .gitignore
+├── .pre-commit-config.yaml
+├── .python-version
 ├── justfile
 ├── pyproject.toml               ← uv-Workspace-Root
 ├── uv.lock
