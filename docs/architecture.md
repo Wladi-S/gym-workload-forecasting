@@ -1,10 +1,10 @@
 # Architektur — gym-workload-forecasting
 
-End-to-End-MLOps-Plattform für die Workload-Prognose von 13 Fitnessstudios in Rheinland-Pfalz.
+End-to-End-MLOps-Plattform für die Workload-Prognose von 14 Fitnessstudios in Rheinland-Pfalz.
 
 ## Komponenten (Ist-Stand)
 
-- **Scraper:** Sammelt seit Januar 2023 minutengenaue Workload-Daten der 13 Studios und schreibt nach Supabase. Läuft extern auf einem VPS. Code liegt als Read-only-Kopie in `libs/scraper/`.
+- **Scraper:** Sammelt seit Januar 2023 minutengenaue Workload-Daten der 14 Studios und schreibt nach Supabase. Läuft extern auf einem VPS. Code liegt als Read-only-Kopie in `libs/scraper/`.
 - **uv-Workspace:** Monorepo-Root verwaltet Tool-Konfiguration und Dependencies; ausführbare Code-Module liegen in Workspace-Members unter `libs/` und `apps/`.
 
 ## Komponenten (geplant)
