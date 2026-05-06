@@ -79,6 +79,55 @@ Nach Push auf einen Feature-Branch:
 
 **Sonderfälle:** `--squash` für triviale 1-Liner-PRs (z.B. Typo-Fix), `--rebase` für linear-saubere Sequenzen. Default bleibt `--merge`.
 
+## Lokale Testdatenbank
+
+Die lokale Testdatenbank nutzt Docker Compose und enthält nur Schema + `gym`-Seed-Daten.
+Produktive Rohdaten werden nicht lokal kopiert.
+
+```bash
+uv run just db-test-up
+uv run just db-test-health
+uv run just db-test-psql
+```
+
+Falls Docker Desktop installiert ist, aber `docker compose` nicht im Terminal verfügbar
+ist, kann der Compose-Pfad explizit gesetzt werden:
+
+```bash
+DOCKER_COMPOSE=/Applications/Docker.app/Contents/Resources/cli-plugins/docker-compose \
+  uv run just check-db-integration
+```
+
+Frisch zurücksetzen:
+
+```bash
+uv run just db-test-reset
+```
+
+DB-Integrationstests sind pytest-Tests mit Marker:
+
+```python
+@pytest.mark.db
+```
+
+Normale Checks schließen diese Tests aus. Der dedizierte DB-Pfad startet eine frische
+Testdatenbank, führt nur DB-Tests aus und stoppt die Testdatenbank danach wieder:
+
+```bash
+uv run just check-db-integration
+```
+
+Zum Debuggen kann dieselbe Teststrecke ohne automatisches Aufräumen laufen:
+
+```bash
+uv run just check-db-integration-keep
+uv run just db-test-psql
+uv run just db-test-down
+```
+
+`check-db-integration-keep` lässt Container und Volume bewusst stehen, damit der
+DB-Zustand nach einem Testfehler inspiziert werden kann.
+
 ## Troubleshooting
 
 ### `just check-coverage` failed mit "No tests collected"
