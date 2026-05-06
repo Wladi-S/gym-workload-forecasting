@@ -1,0 +1,25 @@
+name: gym-workload-test
+
+services:
+  postgres-test:
+    image: postgres:17-alpine
+    restart: "no"
+    environment:
+      POSTGRES_DB: gym_workload_test
+      POSTGRES_USER: gym_workload_test
+      POSTGRES_PASSWORD: gym_workload_test
+      TZ: Europe/Berlin
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - postgres_test_data:/var/lib/postgresql/data
+      - ../db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gym_workload_test -d gym_workload_test"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 5s
+
+volumes:
+  postgres_test_data:
