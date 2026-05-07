@@ -31,6 +31,25 @@ uv run just check     # Voll-Check: format, code, type, security, dependency aud
 
 Alle Targets via `uv run just --list`.
 
+## Python-Entry-Points Ausführen
+
+Ausführbare Python-Werkzeuge werden als Paket-CLI über `uv run` gestartet, nicht über
+direkte Dateipfade. Für den Scraper:
+
+```bash
+uv run --env-file .env.dev gym-scraper
+```
+
+Wenn keine Env-Datei nötig ist:
+
+```bash
+uv run gym-scraper
+```
+
+Eine IDE-Run-Configuration kann denselben Weg nutzen oder die gleiche Umgebung explizit
+setzen. Den Play-Button auf einer Python-Datei nur verwenden, wenn die Configuration die
+benötigten Environment-Variablen setzt.
+
 ## Testing
 
 ```bash
@@ -38,6 +57,16 @@ uv run just check-test                       # Schnelle Tests ohne Coverage (par
 uv run just check-coverage                   # Voller Coverage-Run (CI-äquivalent)
 uv run just check-coverage auto 0            # Threshold-Override (Debug)
 ```
+
+Vollständiger lokaler Prüfpfad:
+
+```bash
+uv run just check
+uv run just check-db-integration
+```
+
+`just check` deckt Format, Linting, Typing, Security, Dependency-Audit und Coverage ab.
+`check-db-integration` startet eine frische Testdatenbank und führt die DB-Tests aus.
 
 **Test-Layout:** Tests leben unter Root-`tests/<modul>/`, nicht in Member-Unterordnern.
 
