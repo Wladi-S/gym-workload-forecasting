@@ -30,6 +30,19 @@ Wichtige Gruppen:
 - `SCRAPER_MANDANT`
 - `SCRAPER_LOCAL_DB__*`
 
+## Ausführung
+
+```bash
+# for production runs
+uv run --env-file .env gym-scraper
+
+# for local development
+uv run --env-file .env.dev gym-scraper
+```
+
+Für Produktionsläufe dieselbe CLI mit der passenden Env-Datei oder einer vom
+Prozessmanager gesetzten Umgebung ausführen.
+
 ## Lokale Checks
 
 ```bash
