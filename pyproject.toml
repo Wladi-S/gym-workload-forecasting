@@ -18,19 +18,19 @@ members = ["libs/scraper"]
 [dependency-groups]
 check = [
     "ruff>=0.9",
-    "mypy>=1.13",
+    "mypy>=2.0.0",
     "pytest>=8",
     "pytest-cov>=6",
     "pytest-xdist>=3",
     "pip-audit>=2.7",
-    "types-requests>=2.33.0.20260503",
+    "types-requests>=2.33.0.20260508",
 ]
 commit = [
-    "commitizen>=4.15.0",
+    "commitizen>=4.15.1",
     "pre-commit>=4",
 ]
 dev = [
-    "rust-just>=1.39",
+    "rust-just>=1.51.0",
 ]
 
 [tool.uv]
