@@ -307,7 +307,7 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
-    { name = "psycopg", extras = ["binary"], specifier = ">=3.2" },
+    { name = "psycopg", extras = ["binary"], specifier = ">=3.3.4" },
     { name = "requests", specifier = ">=2.32" },
 ]
 
