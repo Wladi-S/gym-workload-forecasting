@@ -172,6 +172,7 @@ venv.bak/
 docs/superpowers/
 docs/decisions/
 docs/notes/
+docs/prd.md
 CLAUDE.md
 
 # mypy
