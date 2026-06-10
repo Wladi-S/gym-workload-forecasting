@@ -29,11 +29,11 @@ def _scraper_env() -> dict[str, str]:
     config = _db_config()
     return {
         "SCRAPER_MANDANT": "test_mandant",
-        "SCRAPER_LOCAL_DB__HOST": str(config["host"]),
-        "SCRAPER_LOCAL_DB__PORT": str(config["port"]),
-        "SCRAPER_LOCAL_DB__NAME": str(config["dbname"]),
-        "SCRAPER_LOCAL_DB__USER": str(config["user"]),
-        "SCRAPER_LOCAL_DB__PASSWORD": str(config["password"]),
+        "POSTGRES_BIND_ADDR": str(config["host"]),
+        "POSTGRES_HOST_PORT": str(config["port"]),
+        "POSTGRES_DB": str(config["dbname"]),
+        "POSTGRES_USER": str(config["user"]),
+        "POSTGRES_PASSWORD": str(config["password"]),
     }
 
 

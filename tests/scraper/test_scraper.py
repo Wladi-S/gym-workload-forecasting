@@ -13,16 +13,16 @@ BERLIN = ZoneInfo("Europe/Berlin")
 def complete_env() -> dict[str, str]:
     return {
         "SCRAPER_MANDANT": "test_mandant",
-        "SCRAPER_LOCAL_DB__HOST": "local-host",
-        "SCRAPER_LOCAL_DB__PORT": "5433",
-        "SCRAPER_LOCAL_DB__NAME": "local-db",
-        "SCRAPER_LOCAL_DB__USER": "local-user",
-        "SCRAPER_LOCAL_DB__PASSWORD": "local-secret",
+        "POSTGRES_BIND_ADDR": "local-host",
+        "POSTGRES_HOST_PORT": "5433",
+        "POSTGRES_DB": "local-db",
+        "POSTGRES_USER": "local-user",
+        "POSTGRES_PASSWORD": "local-secret",
     }
 
 
 def test_build_db_config_reads_values_from_environment() -> None:
-    config = scraper.build_db_config("SCRAPER_LOCAL_DB", complete_env())
+    config = scraper.build_db_config(complete_env())
 
     assert config == {
         "host": "local-host",
@@ -34,8 +34,19 @@ def test_build_db_config_reads_values_from_environment() -> None:
 
 
 def test_build_db_config_requires_missing_values() -> None:
-    with pytest.raises(RuntimeError, match="SCRAPER_LOCAL_DB__HOST"):
-        scraper.build_db_config("SCRAPER_LOCAL_DB", {})
+    with pytest.raises(RuntimeError, match="POSTGRES_DB"):
+        scraper.build_db_config({})
+
+
+def test_build_db_config_uses_compose_connection_defaults() -> None:
+    env = complete_env()
+    del env["POSTGRES_BIND_ADDR"]
+    del env["POSTGRES_HOST_PORT"]
+
+    config = scraper.build_db_config(env)
+
+    assert config["host"] == "127.0.0.1"
+    assert config["port"] == 5432
 
 
 def test_collect_readings_skips_failed_studio_and_keeps_successes() -> None:

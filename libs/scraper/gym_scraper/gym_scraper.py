@@ -53,25 +53,16 @@ def _env_port(name: str, environ: Mapping[str, str]) -> int:
 
 
 def build_db_config(
-    prefix: str,
     environ: Mapping[str, str] | None = None,
-    *,
-    default_sslmode: str | None = None,
 ) -> DbConfig:
     env = _environment(environ)
-    config: DbConfig = {
-        "host": _required_env(f"{prefix}__HOST", env),
-        "port": _env_port(f"{prefix}__PORT", env),
-        "dbname": _required_env(f"{prefix}__NAME", env),
-        "user": _required_env(f"{prefix}__USER", env),
-        "password": _required_env(f"{prefix}__PASSWORD", env),
+    return {
+        "host": env.get("POSTGRES_BIND_ADDR") or "127.0.0.1",
+        "port": _env_port("POSTGRES_HOST_PORT", env),
+        "dbname": _required_env("POSTGRES_DB", env),
+        "user": _required_env("POSTGRES_USER", env),
+        "password": _required_env("POSTGRES_PASSWORD", env),
     }
-
-    sslmode = env.get(f"{prefix}__SSLMODE") or default_sslmode
-    if sslmode is not None:
-        config["sslmode"] = sslmode
-
-    return config
 
 
 def get_data(gym_id: int, mandant: str) -> dict[str, object]:
@@ -161,7 +152,7 @@ def main(
 ) -> None:
     env = _environment(environ)
     mandant = _required_env("SCRAPER_MANDANT", env)
-    local_db_config = build_db_config("SCRAPER_LOCAL_DB", env)
+    local_db_config = build_db_config(env)
 
     readings = collect_readings(mandant=mandant, gym_ids=gym_ids, fetch=fetch, clock=clock)
     if not readings:
