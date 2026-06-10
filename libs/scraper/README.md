@@ -28,7 +28,11 @@ dokumentiert.
 Wichtige Gruppen:
 
 - `SCRAPER_MANDANT`
-- `SCRAPER_LOCAL_DB__*`
+- `POSTGRES_BIND_ADDR`
+- `POSTGRES_HOST_PORT`
+- `POSTGRES_DB`
+- `POSTGRES_USER`
+- `POSTGRES_PASSWORD`
 
 ## Ausführung
 
