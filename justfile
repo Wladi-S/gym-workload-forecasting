@@ -9,7 +9,7 @@ uv := require("uv")
 set dotenv-load := true
 
 # VARIABLES
-SOURCES := "libs"
+SOURCES := "apps libs"
 TESTS := "tests"
 
 # DEFAULTS
