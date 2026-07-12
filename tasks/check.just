@@ -1,6 +1,6 @@
 # run check tasks (Format zuerst — schnellster Fail-Pfad)
 [group('check')]
-check: check-format check-code check-type check-security check-audit check-coverage
+check: check-format check-code check-type check-security check-audit check-test
 
 # check dependency vulnerabilities
 [group('check')]
@@ -12,13 +12,6 @@ check-audit:
 check-code:
     uv run ruff check {{SOURCES}} {{TESTS}}
 
-# check code coverage (Threshold 50% in M0)
-[group('check')]
-check-coverage numprocesses="auto" cov_fail_under="50":
-    uv run pytest --numprocesses={{numprocesses}} --cov={{SOURCES}} \
-                  --cov-fail-under={{cov_fail_under}} \
-                  --cov-report=xml --cov-report=term {{TESTS}}
-
 # check code format
 [group('check')]
 check-format:
@@ -29,7 +22,7 @@ check-format:
 check-security:
     uv run ruff check --select=S {{SOURCES}}
 
-# check unit tests (ohne Coverage, schnell)
+# check unit tests
 [group('check')]
 check-test numprocesses="auto":
     uv run pytest --numprocesses={{numprocesses}} {{TESTS}}

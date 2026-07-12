@@ -26,7 +26,7 @@ Nicht in `just install` enthalten und einmalig vom Maintainer auszuführen:
 
 ```bash
 uv run just format    # Auto-Fix Imports + Formatting
-uv run just check     # Voll-Check: format, code, type, security, dependency audit, coverage
+uv run just check     # Voll-Check: format, code, type, security, dependency audit, tests
 ```
 
 Alle Targets via `uv run just --list`.
@@ -53,9 +53,7 @@ benötigten Environment-Variablen setzt.
 ## Testing
 
 ```bash
-uv run just check-test                       # Schnelle Tests ohne Coverage (parallel)
-uv run just check-coverage                   # Voller Coverage-Run (CI-äquivalent)
-uv run just check-coverage auto 0            # Threshold-Override (Debug)
+uv run just check-test                       # Tests ohne DB-Integration (parallel)
 ```
 
 Vollständiger lokaler Prüfpfad:
@@ -65,7 +63,7 @@ uv run just check
 uv run just check-db-integration
 ```
 
-`just check` deckt Format, Linting, Typing, Security, Dependency-Audit und Coverage ab.
+`just check` deckt Format, Linting, Typing, Security, Dependency-Audit und Tests ab.
 `check-db-integration` startet eine frische Testdatenbank und führt die DB-Tests aus.
 
 **Test-Layout:** Tests leben unter Root-`tests/<modul>/`, nicht in Member-Unterordnern.
@@ -97,7 +95,7 @@ Nach Push auf einen Feature-Branch:
 | Prefix | Beispiel |
 |---|---|
 | `feat/<topic>` | `feat/scraper-import` |
-| `fix/<topic>` | `fix/coverage-report-path` |
+| `fix/<topic>` | `fix/dagster-config` |
 | `chore/<topic>` | `chore/update-ruff-0.10` |
 | `docs/<topic>` | `docs/architecture-diagram` |
 | `refactor/<topic>` | `refactor/scraper-pure-functions` |
@@ -158,9 +156,6 @@ uv run just db-test-down
 DB-Zustand nach einem Testfehler inspiziert werden kann.
 
 ## Troubleshooting
-
-### `just check-coverage` failed mit "No tests collected"
-→ Tests existieren nicht oder liegen nicht unter `tests/`. Override: `uv run just check-coverage auto 0`.
 
 ### `uv sync` failed mit "package gym-scraper has no source"
 → `libs/scraper/gym_scraper/__init__.py` fehlt oder `[tool.uv.sources]` nicht gesetzt.

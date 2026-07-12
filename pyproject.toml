@@ -23,7 +23,6 @@ check = [
     "pytest-xdist>=3",
     "pip-audit>=2.7",
     "types-requests>=2.33.0.20260503",
-    "pytest-cov>=6",
 ]
 commit = [
     "commitizen>=4.15.0",
