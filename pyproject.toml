@@ -11,7 +11,6 @@ dependencies = []
 
 [tool.uv.workspace]
 members = [
-    "libs/scraper",
     "apps/pipeline",
 ]
 
@@ -23,6 +22,7 @@ check = [
     "pytest-xdist>=3",
     "pip-audit>=2.7",
     "types-requests>=2.33.0.20260503",
+    "psycopg[binary]>=3.2",
 ]
 commit = [
     "commitizen>=4.15.0",
@@ -80,7 +80,7 @@ markers = [
 filterwarnings = ["error"]
 
 [tool.coverage.run]
-source = ["libs"]
+source = ["apps"]
 branch = true
 
 [tool.coverage.report]
