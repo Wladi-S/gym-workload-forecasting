@@ -31,19 +31,13 @@ uv run just check     # Voll-Check: format, code, type, security, dependency aud
 
 Alle Targets via `uv run just --list`.
 
-## Python-Entry-Points Ausführen
+## Dagster lokal ausführen
 
-Ausführbare Python-Werkzeuge werden als Paket-CLI über `uv run` gestartet, nicht über
-direkte Dateipfade. Für den Scraper:
-
-```bash
-uv run --env-file .env.dev gym-scraper
-```
-
-Wenn keine Env-Datei nötig ist:
+Das Dagster-Projekt wird über seine Paket-CLI ausgeführt, nicht über direkte Dateipfade:
 
 ```bash
-uv run gym-scraper
+uv --directory apps/pipeline run --package pipeline dg check defs
+uv --directory apps/pipeline run --package pipeline dg dev
 ```
 
 Eine IDE-Run-Configuration kann denselben Weg nutzen oder die gleiche Umgebung explizit
@@ -156,9 +150,6 @@ uv run just db-test-down
 DB-Zustand nach einem Testfehler inspiziert werden kann.
 
 ## Troubleshooting
-
-### `uv sync` failed mit "package gym-scraper has no source"
-→ `libs/scraper/gym_scraper/__init__.py` fehlt oder `[tool.uv.sources]` nicht gesetzt.
 
 ### `pre-commit run` failed wiederholt
 → Hooks sind autofix-fähig (Ruff, end-of-file-fixer). Nach erstem Lauf: `git add -u` und erneut commit/push.

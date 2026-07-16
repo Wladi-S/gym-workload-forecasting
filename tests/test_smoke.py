@@ -1,5 +1,5 @@
-import gym_scraper
+import pipeline
 
 
-def test_package_importable() -> None:
-    assert gym_scraper is not None
+def test_pipeline_package_importable() -> None:
+    assert pipeline is not None

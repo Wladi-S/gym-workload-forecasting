@@ -4,8 +4,8 @@ End-to-End-MLOps-Plattform für die Workload-Prognose von 14 Fitnessstudios in R
 
 ## Komponenten (Ist-Stand)
 
-- **Scraper:** Sammelt seit Januar 2023 minutengenaue Workload-Daten der 14 Studios und schreibt nach Supabase. Läuft extern auf einem VPS. Code liegt als Read-only-Kopie in `libs/scraper/`.
-- **uv-Workspace:** Monorepo-Root verwaltet Tool-Konfiguration und Dependencies; ausführbare Code-Module liegen in Workspace-Members unter `libs/` und `apps/`.
+- **Scraper-Migration:** Der bisherige Scraper-Code unter `libs/scraper/` wurde entfernt und wird in die Dagster-Pipeline integriert.
+- **uv-Workspace:** Monorepo-Root verwaltet Tool-Konfiguration und Dependencies; die Dagster-Pipeline liegt als Workspace-Member unter `apps/pipeline/`.
 
 ## Komponenten (geplant)
 

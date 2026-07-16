@@ -1,1 +1,0 @@
-"""Gym workload scraper package."""
