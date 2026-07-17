@@ -1,19 +1,23 @@
 import dagster as dg
+from pipeline.defs.resources import PostgresResource
+
 from .resources import GymApiResource
 from .scraper import run_scraper
 
 
 @dg.asset(
     group_name="ingestion",
-    kinds={"Postgres", "Python"},
+    kinds={"postgres", "python"},
     tags={"domain": "gym", "layer": "raw"},
+    pool="gym_ingestion",
 )
 def gym_observations(
     context: dg.AssetExecutionContext,
     gym_api: GymApiResource,
+    postgres: PostgresResource,
 ):
     """Raw gym workload observations fetched from API and stored in PostgreSQL."""
-    result = run_scraper(gym_api)
+    result = run_scraper(gym_api, postgres)
 
     for gym_id in result.failed_gym_ids:
         context.log.warning("Abruf für Studio %s fehlgeschlagen", gym_id)

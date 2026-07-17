@@ -1,12 +1,11 @@
 import math
+import os
 
 import dagster as dg
 import requests
 
-import os
 
-
-class GymApiResource(dg.ConfigurableResource["GymApiResource"]):
+class GymApiResource(dg.ConfigurableResource):
     """Client for the external gym workload API."""
 
     mandant: str

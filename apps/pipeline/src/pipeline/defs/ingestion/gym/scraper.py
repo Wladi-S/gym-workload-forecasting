@@ -1,11 +1,10 @@
 from dataclasses import dataclass
 from datetime import UTC, datetime
-import os
 
-import psycopg
 import requests
+from pipeline.defs.resources import PostgresResource
+
 from .resources import GymApiResource
-from psycopg.conninfo import make_conninfo
 
 GYM_IDS = (
     1,
@@ -71,11 +70,11 @@ def collect_readings(
     return readings, failed_gym_ids
 
 
-def write_readings(db_config, readings) -> int:
+def write_readings(postgres: PostgresResource, readings) -> int:
     inserted = 0
 
     with (
-        psycopg.connect(make_conninfo(**db_config)) as connection,
+        postgres.get_connection() as connection,
         connection.cursor() as cursor,
     ):
         for gym_id, workload, recorded_at in readings:
@@ -94,15 +93,7 @@ def write_readings(db_config, readings) -> int:
     return inserted
 
 
-def run_scraper(gym_api: GymApiResource):
-
-    db_config = {
-        "host": os.getenv("HOST"),
-        "port": os.getenv("PORT"),
-        "dbname": os.getenv("DBNAME"),
-        "user": os.getenv("DBUSER"),
-        "password": os.getenv("PASSWORD"),
-    }
+def run_scraper(gym_api: GymApiResource, postgres: PostgresResource):
 
     readings, failed_gym_ids = collect_readings(
         GYM_IDS,
@@ -112,7 +103,7 @@ def run_scraper(gym_api: GymApiResource):
     if not readings:
         raise RuntimeError("All gym requests failed")
 
-    inserted = write_readings(db_config, readings)
+    inserted = write_readings(postgres, readings)
 
     return ScrapeResults(
         successful=len(readings),
