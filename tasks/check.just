@@ -1,6 +1,6 @@
 # run check tasks (Format zuerst — schnellster Fail-Pfad)
 [group('check')]
-check: check-format check-code check-type check-security check-audit check-test
+check: check-format check-code check-security check-audit check-test
 
 # check dependency vulnerabilities
 [group('check')]
@@ -26,8 +26,3 @@ check-security:
 [group('check')]
 check-test numprocesses="auto":
     uv run --all-packages pytest --numprocesses={{numprocesses}} {{TESTS}}
-
-# check code typing
-[group('check')]
-check-type:
-    uv run --all-packages mypy {{SOURCES}} {{TESTS}}

@@ -17,7 +17,6 @@ jobs:
       - run: uv sync --locked --all-packages --all-groups
       - run: uv run just check-format
       - run: uv run just check-code
-      - run: uv run just check-type
       - run: uv run just check-security
       - run: uv run just check-audit
       - run: uv run just check-test

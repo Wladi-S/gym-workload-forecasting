@@ -1,9 +1,5 @@
 [group('clean')]
-clean: clean-mypy clean-pytest clean-python clean-ruff
-
-[group('clean')]
-clean-mypy:
-    rm -rf .mypy_cache/
+clean: clean-pytest clean-python clean-ruff
 
 [group('clean')]
 clean-pytest:

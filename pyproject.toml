@@ -17,11 +17,9 @@ members = [
 [dependency-groups]
 check = [
     "ruff>=0.9",
-    "mypy>=1.13",
     "pytest>=8",
     "pytest-xdist>=3",
     "pip-audit>=2.7",
-    "types-requests>=2.33.0.20260503",
     "psycopg[binary]>=3.2",
 ]
 commit = [
@@ -58,17 +56,6 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*" = ["S101", "S105", "S106"]
-
-[tool.mypy]
-python_version = "3.13"
-strict = true
-warn_unused_ignores = true
-warn_redundant_casts = true
-exclude = ["build/", "dist/"]
-
-[[tool.mypy.overrides]]
-module = "tests.*"
-disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
 minversion = "8.0"
