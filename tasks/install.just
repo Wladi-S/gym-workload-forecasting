@@ -8,7 +8,7 @@ install-hooks:
 
 [group('install')]
 install-project:
-    uv sync --all-groups
+    uv sync --all-packages --all-groups
 
 [group('install')]
 install-rulesets:

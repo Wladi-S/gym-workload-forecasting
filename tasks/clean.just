@@ -1,15 +1,5 @@
 [group('clean')]
-clean: clean-coverage clean-mypy clean-pytest clean-python clean-ruff
-
-[group('clean')]
-clean-coverage:
-    rm -rf .coverage*
-    rm -rf coverage.xml
-    rm -rf htmlcov/
-
-[group('clean')]
-clean-mypy:
-    rm -rf .mypy_cache/
+clean: clean-pytest clean-python clean-ruff
 
 [group('clean')]
 clean-pytest:
