@@ -94,7 +94,6 @@ def write_readings(postgres: PostgresResource, readings) -> int:
 
 
 def run_scraper(gym_api: GymApiResource, postgres: PostgresResource):
-
     readings, failed_gym_ids = collect_readings(
         GYM_IDS,
         fetch_workload=gym_api.fetch_workload,
