@@ -16,18 +16,18 @@ members = [
 
 [dependency-groups]
 check = [
-    "ruff>=0.9",
-    "pytest>=8",
+    "ruff>=0.15.22",
+    "pytest>=9.1.1",
     "pytest-xdist>=3",
-    "pip-audit>=2.7",
-    "psycopg[binary]>=3.2",
+    "pip-audit>=2.10.1",
+    "psycopg[binary]>=3.3.4",
 ]
 commit = [
-    "commitizen>=4.15.0",
+    "commitizen>=4.16.5",
     "pre-commit>=4",
 ]
 dev = [
-    "rust-just>=1.39",
+    "rust-just>=1.57.0",
 ]
 
 [tool.uv]
@@ -80,7 +80,7 @@ exclude_lines = [
 show_missing = true
 
 [build-system]
-requires = ["hatchling>=1.29.0"]
+requires = ["hatchling>=1.31.0"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]

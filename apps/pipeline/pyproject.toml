@@ -4,7 +4,7 @@ requires-python = ">=3.13,<3.15"
 version = "0.1.0"
 dependencies = [
     "dagster==1.13.14",
-    "psycopg[binary]>=3.2",
+    "psycopg[binary]>=3.3.4",
     "requests>=2.33.1",
 ]
 
